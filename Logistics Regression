@@ -1,0 +1,115 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
+
+#Question 1
+def LogisticRegression(n,m,theta):
+    # n-Size of Dataset,m-Number of Inpendent variable,theta-The probability of ﬂipping the label
+    x=np.random.rand(n,m)
+    
+    ones=np.ones((n,1))
+    
+    x_new = np.append(ones,x,axis=1)
+    
+    beta=np.random.randn(m+1).reshape(m+1,1)
+    
+    y=np.dot(x_new,beta)
+    
+    y=y+theta
+    
+    y=np.where(y > .5, 1, 0)
+    
+    return x_new,y,beta; # Output from the function:X: An n×m , Y: The n×1 ,βeta: The random coefﬁcients
+
+def Sigmoid(x):
+    
+    return 1/(1+np.exp(-x))
+
+def Cross_Entropy(beta,x,y):
+    
+    prediction=np.dot(x,beta)
+        
+    final=Sigmoid(prediction)
+        
+    return np.sum(y*np.log(final)+(1-y)*np.log(1-final))*(-1/len(y))
+
+#Question 2
+
+def gradient(x,y,learning_rate,thersold,number_of_iters):
+    
+    cost_history=[]
+    
+    thersold1=[]
+    
+    beta=np.random.randn(3).reshape(3,1)
+    
+    cost=Cross_Entropy(beta,x,y)
+    
+    for i in range(number_of_iters):
+        
+        N=len(x)
+    
+        prediction=np.dot(x,beta)
+        
+        final=Sigmoid(prediction)
+    
+        gradient=np.dot(x.T,final)
+    
+        gradient/=N
+    
+        gradient*=learning_rate
+    
+        beta-=gradient
+        
+        prev_cost=cost
+        
+        cost=Cross_Entropy(beta,x,y)
+        
+        temp=cost-prev_cost
+        
+        if temp>thersold:
+            print("Local Minima",i)
+            break
+      
+        thersold1.append(temp)
+        
+        plt.scatter(i,cost)
+        plt.xlabel("Iteration")
+        plt.ylabel("Cost")
+        plt.legend("cost")
+        
+        cost_history.append(cost)
+        
+    return beta,cost_history,thersold1
+
+x,y,beta=LogisticRegression(10,2,.06)   
+gradient(x,y,.3,.001,30)       
+
+
+#Ridge Regression
+
+lambda1=[10,5,1,.1,.01,.001,.0001,.00001]
+
+for i in range(len(lambda1)):
+    x,y,beta=LogisticRegression(10,2,.05)
+    new_cross_entropy=Cross_Entropy(beta,x,y)+lambda1[i]*abs(np.sum(beta)**2)
+   
+    plt.bar(i,new_cross_entropy)
+    plt.xlabel("Lambda")
+    plt.ylabel("new_cross_entropy")
+    print("Cross_entropy",new_cross_entropy)
+    print("Beta",beta)
+
+#Question 4
+#Lasso Regression
+lambda1=[10,5,1,.1,.01,.001,.0001,.000001]
+for i in range(len(lambda1)):
+    x,y,beta=LogisticRegression(10,2,.05)
+    new_cross_entropy=Cross_Entropy(beta,x,y)+lambda1[i]*abs(np.sum(beta))
+   
+    plt.bar(i,new_cross_entropy)
+    plt.xlabel("Lambda")
+    plt.ylabel("new_cross_entropy")
+    print("Cross_entropy",new_cross_entropy)
+    print("Beta",beta)
