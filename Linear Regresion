@@ -1,0 +1,85 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
+e=10 #Unexplained variation
+
+def Linearregression(n,m,sig):
+    
+    x=np.random.random((n,m))
+    
+    ones=np.ones((n,1))
+    
+    x_new = np.append(ones,x,axis=1)
+    
+    beta=np.random.randn(m+1).reshape(m+1,1)
+    
+    y=np.dot(x_new,beta)+e
+    
+    y=y+sig
+    
+    plt.scatter(x_new[:,1],y)
+    
+    return x_new,y,beta
+def CostFunction(beta,x,y):
+    
+    y_hat=np.dot(x,beta)
+    
+    error=np.sum(y-y_hat)**2
+    
+    error=error/len(y)
+    
+    return error
+
+def update_weight(x,y,beta,learning_rate):
+    
+    beta_deriv=0
+    
+    N=len(y)
+    
+    for i in range(N):
+        
+        beta_deriv+= -2*(y[i]-np.dot(x[i],beta))
+        
+        beta-=(beta_deriv/N)*learning_rate
+        
+        return beta
+        
+ def gradient(x,y,learning_rate,number_of_iters,thersold):
+    
+    cost_history=[]
+    
+    beta=np.random.randn(3).reshape(3,1)
+    
+    cost=CostFunction(beta,x,y)
+    
+    for i in range(number_of_iters):
+        
+        beta=update_weight(x,y,beta,learning_rate)
+        
+        prev_cost=cost
+        
+        cost=CostFunction(beta,x,y)
+        
+        temp=prev_cost-cost
+        
+        if temp<thersold:
+            
+            print("Local Minima",i)
+            print("Beta at Local Minima",beta)
+            
+            break
+            
+        plt.scatter(i,cost)
+        plt.xlabel("Iteration")
+        plt.ylabel("Cost")
+        plt.legend("cost")
+        
+        cost_history.append(cost)
+        
+        if i%10==0:
+            
+            print ("iter={} beta {} cost={}".format(i, beta,cost))
+    
+    return beta,cost_history
+ 
